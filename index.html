@@ -18,25 +18,25 @@ const fn = "332020_fire_hydrant_202404_standard.csv";
 const allflg = new URL(document.location).searchParams.get("all") === "";
 
 const getLL = function(lat, lng) {
-	return [lat, lng];
+  return [lat, lng];
 };
 
-//	DEFAULT_ORG = new google.maps.LatLng(40.392834, -3.723986); // madrid
+//  DEFAULT_ORG = new google.maps.LatLng(40.392834, -3.723986); // madrid
 //const DEFAULT_ORG = new getLL(35.943352, 136.188597); // sabae st.
 //const { lat, lng } = Geo3x3.decode("E91387367371883486"); // fukui st.
 const { lat, lng } = Geo3x3.decode("E913712673633332"); // kurashiki city
 const DEFAULT_ORG = new getLL(lat, lng);
-//	DEFAULT_ORG = new google.maps.LatLng(34.834509, 138.177419); // shimada city
-//	DEFAULT_ORG = new google.maps.LatLng(35.691180, 139.701038); // shinjuku st. east
+//  DEFAULT_ORG = new google.maps.LatLng(34.834509, 138.177419); // shimada city
+//  DEFAULT_ORG = new google.maps.LatLng(35.691180, 139.701038); // shinjuku st. east
 
 let watchid;
 const supportgps = typeof navigator.geolocation != 'undefined';
 
 const showNearest = function() {
-	if (supportgps)
-		dir();
-	else
-		setPosition(DEFAULT_ORG, 5);
+  if (supportgps)
+    dir();
+  else
+    setPosition(DEFAULT_ORG, 5);
 };
 
 /* 
@@ -47,29 +47,29 @@ http://fukuno.jig.jp/app/odp/datalist.html
 const TYPE = "http://purl.org/jrrk#Hydrant";
 
 const getIconHydrant = function(data) {
-	// ['公設消火栓', '公設防火水槽', '河川', 'その他', 'プール', '受水槽', '私設防火水槽', '私設消火栓', '海', '堀', '沈砂池']
-	const c = data.classified;
-	if (c.endsWith("消火栓")) return "img/icon_hydrant.png";
-	if (c.endsWith("防火水槽") || c.endsWith("防火水そう")) return "img/icon_hydrant2.png";
-	if (c.endsWith("プール")) return "img/icon_hydrant3.png";
-	return "img/icon_hydrant1.png";
-	/*
-	const ICONS = {
-		"http://odp.jig.jp/res/classified/消火栓": "img/icon_hydrant.png",
-		"http://odp.jig.jp/res/classified/防火水槽": "img/icon_hydrant2.png",
-		"http://odp.jig.jp/res/classified/プール": "img/icon_hydrant3.png",
-		"http://odp.jig.jp/res/classified/その他水利": "img/icon_hydrant1.png",
-	};
-	if (data.classified) {
-		const icon = ICONS[decodeURIComponent(data.classified)];
-		if (icon)
-			return icon;
-	}
-	return "img/icon_hydrant.png";
-	*/
+  // ['公設消火栓', '公設防火水槽', '河川', 'その他', 'プール', '受水槽', '私設防火水槽', '私設消火栓', '海', '堀', '沈砂池']
+  const c = data.classified;
+  if (c.endsWith("消火栓")) return "img/icon_hydrant.png";
+  if (c.endsWith("防火水槽") || c.endsWith("防火水そう")) return "img/icon_hydrant2.png";
+  if (c.endsWith("プール")) return "img/icon_hydrant3.png";
+  return "img/icon_hydrant1.png";
+  /*
+  const ICONS = {
+    "http://odp.jig.jp/res/classified/消火栓": "img/icon_hydrant.png",
+    "http://odp.jig.jp/res/classified/防火水槽": "img/icon_hydrant2.png",
+    "http://odp.jig.jp/res/classified/プール": "img/icon_hydrant3.png",
+    "http://odp.jig.jp/res/classified/その他水利": "img/icon_hydrant1.png",
+  };
+  if (data.classified) {
+    const icon = ICONS[decodeURIComponent(data.classified)];
+    if (icon)
+      return icon;
+  }
+  return "img/icon_hydrant.png";
+  */
 };
 const icons = {
-	"http://purl.org/jrrk#Hydrant": { icon: "img/icon_hydrant.png", name: "消火栓", getIcon: getIconHydrant }
+  "http://purl.org/jrrk#Hydrant": { icon: "img/icon_hydrant.png", name: "消火栓", getIcon: getIconHydrant }
 };
 
 /*
@@ -77,458 +77,458 @@ translated by
 http://webtranslation.paralink.com/translator/default.asp
 */
 const CAP = {
-	en: [ "nearest", "find a refuge", "Monument" ],
-	ja: [ "最短", "避難所を探す", "モニュメント" ],
-	es: [ "Más corta", "refugio", "monumento" ],
-	zh: [ "最近", "找到避难所", "纪念碑"  ],
-	ko: [ "가장 가까운", "피난처를 찾아", "기념물" ],
-	de: [ "nächste", "finden Sie einen Unterschlupf", "Denkmal", ],
-	ca: [ "més proper", "trobar un refugi", "monument" ],
-	pt: [ "quase", "finden Sie einen Unterschlupf", "monumento" ],
-	tl: [ "kalapitan", "makahanap ng isang magkubli", "bantayog" ], // タガログ
-	fa: [ "نزديكترين", "نزديكترين", "اثر تاریخی" ], // ペルシャ語
+  en: [ "nearest", "find a refuge", "Monument" ],
+  ja: [ "最短", "避難所を探す", "モニュメント" ],
+  es: [ "Más corta", "refugio", "monumento" ],
+  zh: [ "最近", "找到避难所", "纪念碑"  ],
+  ko: [ "가장 가까운", "피난처를 찾아", "기념물" ],
+  de: [ "nächste", "finden Sie einen Unterschlupf", "Denkmal", ],
+  ca: [ "més proper", "trobar un refugi", "monument" ],
+  pt: [ "quase", "finden Sie einen Unterschlupf", "monumento" ],
+  tl: [ "kalapitan", "makahanap ng isang magkubli", "bantayog" ], // タガログ
+  fa: [ "نزديكترين", "نزديكترين", "اثر تاریخی" ], // ペルシャ語
 };
 const trans = function(s) {
-	for (let i = 0; i < CAP.en.length; i++) {
-		if (s == CAP.en[i]) {
-			let lang = getLanguage2();
-			if (CAP[lang] == null)
-				lang = "en";
-			return CAP[lang][i];
-		}
-	}
-	return s;
+  for (let i = 0; i < CAP.en.length; i++) {
+    if (s == CAP.en[i]) {
+      let lang = getLanguage2();
+      if (CAP[lang] == null)
+        lang = "en";
+      return CAP[lang][i];
+    }
+  }
+  return s;
 };
 const lang = function(s, loadapi) {
 //alert(s);
-	const v = CAP[s];
-	if (v == null)
-		v = CAP["en"];
-	get("btnf").textContent = trans(get("btnf").textContent);
-//	document.title = v[1];
-	
-	if (loadapi !== false) {
-		document.location.hash = "#" + s;
-		document.location.reload();
-	}
+  const v = CAP[s];
+  if (v == null)
+    v = CAP["en"];
+  get("btnf").textContent = trans(get("btnf").textContent);
+//  document.title = v[1];
+  
+  if (loadapi !== false) {
+    document.location.hash = "#" + s;
+    document.location.reload();
+  }
 };
 window.onload = function() {
-	init();
+  init();
 };
 let map;
 const init = async () => {
-	lang(getLanguage2(), false);
-	map = await LeafletGSI.initMap(divmap);
-	
-	get('btnp').onclick = function() {
-		if (dislist == null)
-			return;
-		if (currentdislist > 0) {
-			currentdislist--;
-			navigate(dislist[currentdislist].marker);
-		}
-	};
-	get('btnn').onclick = function() {
-		if (dislist == null)
-			return;
-		if (currentdislist < dislist.length - 1) {
-			currentdislist++;
-			navigate(dislist[currentdislist].marker);
-		}
-	};
-	get('btnf').onclick = function() {
-		if (dislist == null) {
-			showNearest();
-			return;
-		}
-		currentdislist = 0;
-		navigate(dislist[currentdislist].marker);
-	};
-	
-	markers.length = 0;
-	bounds.length = 0;
-	
-	showNearest();
+  lang(getLanguage2(), false);
+  map = await LeafletGSI.initMap(divmap);
+  
+  get('btnp').onclick = function() {
+    if (dislist == null)
+      return;
+    if (currentdislist > 0) {
+      currentdislist--;
+      navigate(dislist[currentdislist].marker);
+    }
+  };
+  get('btnn').onclick = function() {
+    if (dislist == null)
+      return;
+    if (currentdislist < dislist.length - 1) {
+      currentdislist++;
+      navigate(dislist[currentdislist].marker);
+    }
+  };
+  get('btnf').onclick = function() {
+    if (dislist == null) {
+      showNearest();
+      return;
+    }
+    currentdislist = 0;
+    navigate(dislist[currentdislist].marker);
+  };
+  
+  markers.length = 0;
+  bounds.length = 0;
+  
+  showNearest();
 };
 const markers = [];
 const bounds = [];
 const makeMarkerItem = function(d) {
-	const lat = d.latitude || d.lat;
-	const lng = d.longitude || d.lng;
-	const ll = getLL(lat, lng);
-	d.pos = ll;
-	bounds.push(ll);
-	const marker = makeMarker(map, ll, d);
-	markers.push(marker);
-	marker.data = d;
-	marker.bindPopup(getContent(marker.data));
-	marker.on("click", function(e) {
-		marker.openPopup();
-	});
+  const lat = d.latitude || d.lat;
+  const lng = d.longitude || d.lng;
+  const ll = getLL(lat, lng);
+  d.pos = ll;
+  bounds.push(ll);
+  const marker = makeMarker(map, ll, d);
+  markers.push(marker);
+  marker.data = d;
+  marker.bindPopup(getContent(marker.data));
+  marker.on("click", function(e) {
+    marker.openPopup();
+  });
 };
 const clearMarkers = function() {
-	for (let i = 0; i < markers.length; i++) {
-		markers[i].setMap(null);
-	}
+  for (let i = 0; i < markers.length; i++) {
+    markers[i].setMap(null);
+  }
 };
 
 let cacheddata = null;
 const fetchRefuge = async () => {
-	if (cacheddata) return cacheddata;
-	//		"select ?s ?name ?nameen ?lat ?lng ?classified ?graph ?address ?incharge ?diameter {\n" + 
-	// 福井市: fire_hydrants,種別,管轄署所,住所,緯度,経度,口径,備考
-	// 倉敷市: 全国地方公共団体コード,ID,地方公共団体名,種別,所在地_全国地方公共団体コード,町字ID,所在地_連結表記,所在地_都道府県,所在地_市区町村,所在地_町字,所在地_番地以下,建物名等(方書),緯度,経度,口径,備考
-	const data = await CSV.fetchJSON(fn);
-	const map = {
-		fire_hydrants: "name",
-		ID: "name",
-		緯度: "lat",
-		経度: "lng",
-		種別: "classified",
-		住所: "address",
-		所在地_連結表記: "address",
-		口径: "diameter",
-		備考: "note",
-	};
-	const res = data.map(i => {
-		const o = {};
-		for (const name in i) {
-			const name2 = map[name];
-			if (name2) {
-				o[name2] = i[name];
-			}
-		}
-		o.s = "http://linkdata.org/work/rdf1s9409i";
-		return o;
-	});
-	const clss = ArrayUtil.toUnique(res.map(i => i.classified));
-	console.log(clss);
-	// ['公設消火栓', '公設防火水槽', '河川', 'その他', 'プール', '受水槽', '私設防火水槽', '私設消火栓', '海', '堀', '沈砂池'] // 福井市
-	// ['消火栓', '防火水そう'] // 倉敷市
-	res.forEach(i => {
-		if (i.lat > 90) {
-			const tmp = i.lat;
-			i.lat = i.lng;
-			i.lng = tmp;
-			//console.log("flipped 緯度経度", i.ID);
-		}
-	});
-	console.log(res);
-	return res;
+  if (cacheddata) return cacheddata;
+  //    "select ?s ?name ?nameen ?lat ?lng ?classified ?graph ?address ?incharge ?diameter {\n" + 
+  // 福井市: fire_hydrants,種別,管轄署所,住所,緯度,経度,口径,備考
+  // 倉敷市: 全国地方公共団体コード,ID,地方公共団体名,種別,所在地_全国地方公共団体コード,町字ID,所在地_連結表記,所在地_都道府県,所在地_市区町村,所在地_町字,所在地_番地以下,建物名等(方書),緯度,経度,口径,備考
+  const data = await CSV.fetchJSON(fn);
+  const map = {
+    fire_hydrants: "name",
+    ID: "name",
+    緯度: "lat",
+    経度: "lng",
+    種別: "classified",
+    住所: "address",
+    所在地_連結表記: "address",
+    口径: "diameter",
+    備考: "note",
+  };
+  const res = data.map(i => {
+    const o = {};
+    for (const name in i) {
+      const name2 = map[name];
+      if (name2) {
+        o[name2] = i[name];
+      }
+    }
+    o.s = "http://linkdata.org/work/rdf1s9409i";
+    return o;
+  });
+  const clss = ArrayUtil.toUnique(res.map(i => i.classified));
+  console.log(clss);
+  // ['公設消火栓', '公設防火水槽', '河川', 'その他', 'プール', '受水槽', '私設防火水槽', '私設消火栓', '海', '堀', '沈砂池'] // 福井市
+  // ['消火栓', '防火水そう'] // 倉敷市
+  res.forEach(i => {
+    if (i.lat > 90) {
+      const tmp = i.lat;
+      i.lat = i.lng;
+      i.lng = tmp;
+      //console.log("flipped 緯度経度", i.ID);
+    }
+  });
+  console.log(res);
+  return res;
 };
 
 const loadRefuge = async (ll) => {
-	clearMarkers();
+  clearMarkers();
 
-	const items0 = await fetchRefuge();
-	const items1 = items0.filter(i => {
-		if (i.lat < 0) {
-			console.log("ERROR DATA", i);
-			return false;
-		}
-		return true;
-	});
-	const dlat = 0.01 / 2;
-	const dlng = 0.02 / 2;
-	const lat = ll[0];
-	const lng = ll[1];
-	const latmin = lat - dlat;
-	const latmax = lat + dlat;
-	const lngmin = lng - dlng;
-	const lngmax = lng + dlng;
-	const items = items1.filter(i => {
-		if (allflg) return true;
-		return i.lat >= latmin && i.lat <= latmax && i.lng >= lngmin && i.lng <= lngmax;
-	});
-	console.log(items0.length, "->", items1.length, "->", items.length);
-	
-	bounds.length = 0;
-	items.forEach(i => {
-		i.type = TYPE;
-		i.graph = "";
-		makeMarkerItem(i);
-	});
-	if (items.length > 0) {
-		map.fitBounds(L.latLngBounds(bounds));
-	}
+  const items0 = await fetchRefuge();
+  const items1 = items0.filter(i => {
+    if (i.lat < 0) {
+      console.log("ERROR DATA", i);
+      return false;
+    }
+    return true;
+  });
+  const dlat = 0.01 / 2;
+  const dlng = 0.02 / 2;
+  const lat = ll[0];
+  const lng = ll[1];
+  const latmin = lat - dlat;
+  const latmax = lat + dlat;
+  const lngmin = lng - dlng;
+  const lngmax = lng + dlng;
+  const items = items1.filter(i => {
+    if (allflg) return true;
+    return i.lat >= latmin && i.lat <= latmax && i.lng >= lngmin && i.lng <= lngmax;
+  });
+  console.log(items0.length, "->", items1.length, "->", items.length);
+  
+  bounds.length = 0;
+  items.forEach(i => {
+    i.type = TYPE;
+    i.graph = "";
+    makeMarkerItem(i);
+  });
+  if (items.length > 0) {
+    map.fitBounds(L.latLngBounds(bounds));
+  }
 };
 
 const getNearPosition = function(lat, lng) {
-	if (markers.length == 0) return null;
-	const len = 100000000; // 100,000,000m
-	const n = -1;
-	for (let i = 0; i < markers.length; i++) {
-		const m = markers[i];
-		const p = m.getLatLng();
-		const d = getDistance(lat, lng, p.lat, p.lng);
-		if (d < len) {
-			len = d;
-			n = i;
-		}
-	}
-	if (n < 0)
-		return null;
-	get('info').innerHTML = getContent(markers[n].data);
-	return markers[n].getPosition();
+  if (markers.length == 0) return null;
+  const len = 100000000; // 100,000,000m
+  const n = -1;
+  for (let i = 0; i < markers.length; i++) {
+    const m = markers[i];
+    const p = m.getLatLng();
+    const d = getDistance(lat, lng, p.lat, p.lng);
+    if (d < len) {
+      len = d;
+      n = i;
+    }
+  }
+  if (n < 0)
+    return null;
+  get('info').innerHTML = getContent(markers[n].data);
+  return markers[n].getPosition();
 };
 const dislist = [];
 let currentdislist = 0;
 const calcDistanceList = function(lat, lng) {
-	if (markers.length == 0) return false;
-	dislist.length = 0;
-	for (let i = 0; i < markers.length; i++) {
-		const m = markers[i];
-		const p = m.getLatLng();
-		const d = getDistance(lat, lng, p.lat, p.lng);
-		dislist[i] = { marker: m, distance: d };
-	}
-	for (let i = 0; i < dislist.length - 1; i++) {
-		for (let j = i; j < dislist.length; j++) {
-			if (dislist[i].distance > dislist[j].distance) {
-				const tmp = dislist[i];
-				dislist[i] = dislist[j];
-				dislist[j] = tmp;
-			}
-		}
-	}
-	return true;
+  if (markers.length == 0) return false;
+  dislist.length = 0;
+  for (let i = 0; i < markers.length; i++) {
+    const m = markers[i];
+    const p = m.getLatLng();
+    const d = getDistance(lat, lng, p.lat, p.lng);
+    dislist[i] = { marker: m, distance: d };
+  }
+  for (let i = 0; i < dislist.length - 1; i++) {
+    for (let j = i; j < dislist.length; j++) {
+      if (dislist[i].distance > dislist[j].distance) {
+        const tmp = dislist[i];
+        dislist[i] = dislist[j];
+        dislist[j] = tmp;
+      }
+    }
+  }
+  return true;
 };
 const navigate = function(marker) {
-	get('info').innerHTML = getContent(marker.data);
-	//directions(currentpos, marker.getLatLng);
-	openInfo(marker);
+  get('info').innerHTML = getContent(marker.data);
+  //directions(currentpos, marker.getLatLng);
+  openInfo(marker);
 };
 const getDistance = function(lat1, lng1, lat2, lng2) {
-	const dlat = (lat2 - lat1) * Math.PI / 180;
-	const dlng = (lng2 - lng1) * Math.PI / 180;
-	const a = Math.sin(dlat / 2) * Math.sin(dlat / 2)
-		+ Math.cos(lat1 * Math.PI / 180)
-		* Math.cos(lat2 * Math.PI / 180)
-		* Math.sin(dlng / 2) * Math.sin(dlng / 2);
-	return 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) * 6371; // 6371 = R of the Earth in km
+  const dlat = (lat2 - lat1) * Math.PI / 180;
+  const dlng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dlat / 2) * Math.sin(dlat / 2)
+    + Math.cos(lat1 * Math.PI / 180)
+    * Math.cos(lat2 * Math.PI / 180)
+    * Math.sin(dlng / 2) * Math.sin(dlng / 2);
+  return 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) * 6371; // 6371 = R of the Earth in km
 };
 const jptel = function(tel) {
-	if (tel.startsWith("+81-")) {
-		return "0" + tel.substring(4);
-	}
-	return tel;
+  if (tel.startsWith("+81-")) {
+    return "0" + tel.substring(4);
+  }
+  return tel;
 };
 const getName = function(data) {
-	const lang = getLanguage2();
-	const s = data.name;
-	if (lang != "ja" && lang != "zh" && data.nameen != null && data.nameen != "null")
-		s = data.nameen;
-	const n = s.lastIndexOf("@@");
-	if (n > 0)
-		s = s.substring(0, n);
-	return s;
+  const lang = getLanguage2();
+  const s = data.name;
+  if (lang != "ja" && lang != "zh" && data.nameen != null && data.nameen != "null")
+    s = data.nameen;
+  const n = s.lastIndexOf("@@");
+  if (n > 0)
+    s = s.substring(0, n);
+  return s;
 };
 const getContent = function(data) {
-	const pos = data.pos;
-	const mapurl = "https://maps.google.co.jp/maps?ll=" + pos[0] + "," + pos[1];
-	const mapurl_street = "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=" + pos[0] + "," + pos[1];
-	const s = [];
-	s.push("<div id='data'>");
-	
-	let nid = 0;
-	for (let i = 0; i < markers.length; i++) {
-		if (markers[i].data == data) {
-			nid = i + 1;
-			break;
-		}
-	}
-	s.push("<div>" + trans(icons[data.type].name) + " (" + nid + "/" + markers.length + ")</div>");
-	s.push("<div id='title'>" + getName(data) + "</div>");
-	if (data.coverage)
-		s.push("使用可能エリア: " + data.coverage + "<br>");
-	if (data.hours)
-		s.push("使用可能時間: " + data.hours + "<br>");
-	if (data.plugs)
-		s.push("電源: " + data.plugs + "<br>");
-	const f = s => parseFloat(s).toFixed(4);
-	s.push("MAP <a href='" + mapurl + "' target=_blank>" + f(pos[0]) + "," + f(pos[1]) + "</a> (<a href=" + mapurl_street + " target=_blank>ストリートビュー</a>)<br>");
-	if (data.classified)
-		s.push("種別：" + decodeURIComponent(data.classified) + "<br>");
-	if (data.address)
-		s.push("住所：" + decodeURIComponent(data.address) + "<br>");
-	if (data.incharge)
-		s.push("担当課：" + decodeURIComponent(data.incharge) + "<br>");
-	if (data.diameter)
-		s.push("直径：" + decodeURIComponent(data.diameter) + "mm<br>");
-	if (data.note)
-		s.push("備考：" + decodeURIComponent(data.note) + "mm<br>");
-	if (data.s)
-		s.push("出展:" + "<a href='" + data.s + "' target=_blank>" + data.s + "</a><br>");
-//	s.push("DATA <a href='" + data.url + "' target=_blank>" + data.url + "</a><br>");
-//	debug(data.graph);
-	if (data.graph.startsWith("http://odp.jig.jp/rdf/jp/fukui/sabae/")) {
-		s.push("※<a href=http://www.city.sabae.fukui.jp/pageview.html?id=10525 target=_blank>鯖江市公衆WiFi</a>: sabaewifi / sabae12345678");
-	}
-	s.push("</div>");
-	return s.join('');
+  const pos = data.pos;
+  const mapurl = "https://maps.google.co.jp/maps?ll=" + pos[0] + "," + pos[1];
+  const mapurl_street = "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=" + pos[0] + "," + pos[1];
+  const s = [];
+  s.push("<div id='data'>");
+  
+  let nid = 0;
+  for (let i = 0; i < markers.length; i++) {
+    if (markers[i].data == data) {
+      nid = i + 1;
+      break;
+    }
+  }
+  s.push("<div>" + trans(icons[data.type].name) + " (" + nid + "/" + markers.length + ")</div>");
+  s.push("<div id='title'>" + getName(data) + "</div>");
+  if (data.coverage)
+    s.push("使用可能エリア: " + data.coverage + "<br>");
+  if (data.hours)
+    s.push("使用可能時間: " + data.hours + "<br>");
+  if (data.plugs)
+    s.push("電源: " + data.plugs + "<br>");
+  const f = s => parseFloat(s).toFixed(4);
+  s.push("MAP <a href='" + mapurl + "' target=_blank>" + f(pos[0]) + "," + f(pos[1]) + "</a> (<a href=" + mapurl_street + " target=_blank>ストリートビュー</a>)<br>");
+  if (data.classified)
+    s.push("種別：" + decodeURIComponent(data.classified) + "<br>");
+  if (data.address)
+    s.push("住所：" + decodeURIComponent(data.address) + "<br>");
+  if (data.incharge)
+    s.push("担当課：" + decodeURIComponent(data.incharge) + "<br>");
+  if (data.diameter)
+    s.push("直径：" + decodeURIComponent(data.diameter) + "mm<br>");
+  if (data.note)
+    s.push("備考：" + decodeURIComponent(data.note) + "mm<br>");
+  if (data.s)
+    s.push("出展:" + "<a href='" + data.s + "' target=_blank>" + data.s + "</a><br>");
+//  s.push("DATA <a href='" + data.url + "' target=_blank>" + data.url + "</a><br>");
+//  debug(data.graph);
+  if (data.graph.startsWith("http://odp.jig.jp/rdf/jp/fukui/sabae/")) {
+    s.push("※<a href=http://www.city.sabae.fukui.jp/pageview.html?id=10525 target=_blank>鯖江市公衆WiFi</a>: sabaewifi / sabae12345678");
+  }
+  s.push("</div>");
+  return s.join('');
 };
 const iconcache = {};
 const getIcon = (icon) => {
-	const res = iconcache[icon];
-	if (res) return res;
-	const iconw = 48;
-	const iconh = 48;
-	const iconopt = L.icon({
-		iconUrl: icon,
-		iconRetilaUrl: icon,
-		iconSize: [iconw, iconh],
-		iconAnchor: [iconw / 2, iconh / 2],
-		popupAnchor: [0, -iconh / 2],
-	});
-	iconcache[icon] = iconopt;
-	return iconopt;
+  const res = iconcache[icon];
+  if (res) return res;
+  const iconw = 48;
+  const iconh = 48;
+  const iconopt = L.icon({
+    iconUrl: icon,
+    iconRetilaUrl: icon,
+    iconSize: [iconw, iconh],
+    iconAnchor: [iconw / 2, iconh / 2],
+    popupAnchor: [0, -iconh / 2],
+  });
+  iconcache[icon] = iconopt;
+  return iconopt;
 };
 const makeMarker = function(map, pos, data) {
-	const opb = [ "A", "ff3300" ];
-	const op = opb;
-	let icon = icons[data.type].icon
-	if (icons[data.type].getIcon) {
-		icon = icons[data.type].getIcon(data);
-	}
-	const iconopt = getIcon(icon);
-	const marker = L.marker(pos, {
+  const opb = [ "A", "ff3300" ];
+  const op = opb;
+  let icon = icons[data.type].icon
+  if (icons[data.type].getIcon) {
+    icon = icons[data.type].getIcon(data);
+  }
+  const iconopt = getIcon(icon);
+  const marker = L.marker(pos, {
     icon: iconopt,
   });
-	marker.addTo(map);
-	return marker;
+  marker.addTo(map);
+  return marker;
 };
 const openInfo = function(marker) {
-	marker.openPopup();
+  marker.openPopup();
 };
 let currentpos;
 const findNear = function() {
-	const b = calcDistanceList(currentpos[0], currentpos[1]);
-	if (!b)
-		setTimeout(findNear, 100);
-	else {
-		if (dislist.length > 0) {
-			currentdislist = 0;
-			navigate(dislist[currentdislist].marker);
-		}
-	}
+  const b = calcDistanceList(currentpos[0], currentpos[1]);
+  if (!b)
+    setTimeout(findNear, 100);
+  else {
+    if (dislist.length > 0) {
+      currentdislist = 0;
+      navigate(dislist[currentdislist].marker);
+    }
+  }
 };
 const setPosition = function(ll, accuracy) {
-	map.setView(ll, 19);
-	
-	new L.Circle(ll, {
-		fillColor: "#3333ff",
-		fillOpacity: .2,
-		strokeWeight: 0,
-		radius: accuracy
-	}).addTo(map);
-	
-	currentpos = ll;
-	
-	loadRefuge(ll).then(function() {
-		findNear();
-	});
+  map.setView(ll, 19);
+  
+  new L.Circle(ll, {
+    fillColor: "#3333ff",
+    fillOpacity: .2,
+    strokeWeight: 0,
+    radius: accuracy
+  }).addTo(map);
+  
+  currentpos = ll;
+  
+  loadRefuge(ll).then(function() {
+    findNear();
+  });
 }
 const dir = function() {
-	if (watchid != null) {
-		navigator.geolocation.clearWatch(watchid);
-	}
-	watchid = navigator.geolocation.watchPosition(function(p) {
-		navigator.geolocation.clearWatch(watchid);
-		watchid = null;
-		const lat = p.coords.latitude;
-		const lng = p.coords.longitude;
-		const ll = getLL(lat, lng);
-		setPosition(ll, p.coords.accuracy);
-	}, function(e) {
-		setPosition(DEFAULT_ORG, 5);
-		alert("check GPS settings");
-	}, {
-		maximumAge: 30000,
-		enableHighAccuracy: 1
-	});
+  if (watchid != null) {
+    navigator.geolocation.clearWatch(watchid);
+  }
+  watchid = navigator.geolocation.watchPosition(function(p) {
+    navigator.geolocation.clearWatch(watchid);
+    watchid = null;
+    const lat = p.coords.latitude;
+    const lng = p.coords.longitude;
+    const ll = getLL(lat, lng);
+    setPosition(ll, p.coords.accuracy);
+  }, function(e) {
+    setPosition(DEFAULT_ORG, 5);
+    alert("check GPS settings");
+  }, {
+    maximumAge: 30000,
+    enableHighAccuracy: 1
+  });
 };
 
 const getLanguage2 = function() {
-	let lang = getLanguage();
-	const hash = document.location.hash;
-	if (hash.length > 2) {
-		lang = hash.substring(1);
-	}
-	return lang;
+  let lang = getLanguage();
+  const hash = document.location.hash;
+  if (hash.length > 2) {
+    lang = hash.substring(1);
+  }
+  return lang;
 };
 
 document.body.querySelector(".langs").querySelectorAll("a").forEach(i => {
-	i.onclick = (e) => {
-		e.preventDefault();
-		const l = i.getAttribute("x-lang");
-		lang(l);
-	};
+  i.onclick = (e) => {
+    e.preventDefault();
+    const l = i.getAttribute("x-lang");
+    lang(l);
+  };
 });
 </script>
 <style>
 body {
-	margin: 0px;
-	text-align: center;
-	box-sizing: border-box; /* width include border */
-	-webkit-text-size-adjust: none; /* for iPhone */
-	font-family: sans-serif;
+  margin: 0px;
+  text-align: center;
+  box-sizing: border-box; /* width include border */
+  -webkit-text-size-adjust: none; /* for iPhone */
+  font-family: sans-serif;
 }
 #divmap {
-	width: 100%;
-	height: 360px;
+  width: 100%;
+  height: 360px;
 }
 #debug {
-	text-align: left;
+  text-align: left;
 }
 #route {
 }
 #info {
-	text-align: center;
-	margin: 0.5em;
+  text-align: center;
+  margin: 0.5em;
 }
 #data {
-	text-align: left;
-	word-wrap: break-word;
+  text-align: left;
+  word-wrap: break-word;
 }
 #data #title {
-	font-size: 120%;
-	font-weight: bold;
-	margin: 0px;
+  font-size: 120%;
+  font-weight: bold;
+  margin: 0px;
 }
 .nbtn {
-	font-size: 14px;
-	line-height: 24px;
-	height: 30px;
-	width: 90px;
-	border: none;
-	margin: 4px;
-	background-color: #afb;
+  font-size: 14px;
+  line-height: 24px;
+  height: 30px;
+  width: 90px;
+  border: none;
+  margin: 4px;
+  background-color: #afb;
 }
 #tname {
-	font-size: 20px;
-	padding-left: 14px;
+  font-size: 20px;
+  padding-left: 14px;
 }
 .src {
-	margin: 1em;
-	font-size: 80%;
+  margin: 1em;
+  font-size: 80%;
 }
 .langs {
-	margin: 10px 0px 10px 0px;
+  margin: 10px 0px 10px 0px;
 }
 .langs a {
-	color: gray !important;
-	text-decoration: none;
+  color: gray !important;
+  text-decoration: none;
 }
 .src a {
-	color: gray !important;
-	text-decoration: none;
+  color: gray !important;
+  text-decoration: none;
 }
 .pr {
-	font-size: 90%;
+  font-size: 90%;
 }
 .pr a {
-	color: #88f !important;
-	text-decoration: none;
+  color: #88f !important;
+  text-decoration: none;
 }
 </style>
 </head>
