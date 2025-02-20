@@ -15,6 +15,7 @@ import { ArrayUtil } from "https://js.sabae.cc/ArrayUtil.js";
 import { dms2d, sdms2d } from "https://code4fukui.github.io/DMS/DMS.js";
 
 const fn = "syoukasen_20200401.csv";
+const src = "https://data.bodik.jp/dataset/252026_shoukasen_20200401/resource/88ae56c2-504e-41f9-92d3-ff1175e8d94e";
 //const dlat = 0.01 / 2;
 //const dlng = 0.02 / 2;
 const dlat = 0.01 * 20;
@@ -211,7 +212,7 @@ const fetchRefuge = async () => {
         o[name2] = i[name];
       }
     }
-    o.s = "http://linkdata.org/work/rdf1s9409i";
+    o.s = src;
     return o;
   });
   const clss = ArrayUtil.toUnique(res.map(i => i.classified));
@@ -385,7 +386,7 @@ const getContent = function(data) {
   if (data.note)
     s.push("備考：" + decodeURIComponent(data.note) + "mm<br>");
   if (data.s)
-    s.push("出展:" + "<a href='" + data.s + "' target=_blank>" + data.s + "</a><br>");
+    s.push("出典：" + "<a href='" + data.s + "' target=_blank>" + data.s + "</a><br>");
 //  s.push("DATA <a href='" + data.url + "' target=_blank>" + data.url + "</a><br>");
 //  debug(data.graph);
   if (data.graph.startsWith("http://odp.jig.jp/rdf/jp/fukui/sabae/")) {
@@ -516,6 +517,7 @@ body {
 #data {
   text-align: left;
   word-wrap: break-word;
+  word-break: break-all;
 }
 #data #title {
   font-size: 120%;
