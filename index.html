@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">
 <!-- (c)taisukef CC BY  http://fukuno.jig.jp/ -->
-<title>findhydrant 消火栓を探す - 倉敷市オープンデータ</title>
+<title>findhydrant 消火栓を探す - 彦根市オープンデータ</title>
 <meta property="og:image" content="ss.jpg">
 <link rel="apple-touch-icon" href="img/icon_hydrant.png">
 <link rel="icon" href="img/icon_hydrant.png">
@@ -12,8 +12,13 @@ import { get } from "./lib/get.js";
 import { LeafletGSI } from "https://js.sabae.cc/LeafletGSI.js";
 import { Geo3x3 } from "https://geo3x3.com/Geo3x3.js";
 import { ArrayUtil } from "https://js.sabae.cc/ArrayUtil.js";
+import { dms2d, sdms2d } from "https://code4fukui.github.io/DMS/DMS.js";
 
-const fn = "332020_fire_hydrant_202404_standard.csv";
+const fn = "syoukasen_20200401.csv";
+//const dlat = 0.01 / 2;
+//const dlng = 0.02 / 2;
+const dlat = 0.01 * 20;
+const dlng = 0.02 * 20;
 
 const allflg = new URL(document.location).searchParams.get("all") === "";
 
@@ -21,10 +26,12 @@ const getLL = function(lat, lng) {
   return [lat, lng];
 };
 
+// from 緯度経度地図 https://fukuno.jig.jp/app/map/latlng/
 //  DEFAULT_ORG = new google.maps.LatLng(40.392834, -3.723986); // madrid
 //const DEFAULT_ORG = new getLL(35.943352, 136.188597); // sabae st.
 //const { lat, lng } = Geo3x3.decode("E91387367371883486"); // fukui st.
-const { lat, lng } = Geo3x3.decode("E913712673633332"); // kurashiki city
+//const { lat, lng } = Geo3x3.decode("E913712673633332"); // kurashiki city
+const { lat, lng } = Geo3x3.decode("E913843622939672"); // hikone city
 const DEFAULT_ORG = new getLL(lat, lng);
 //  DEFAULT_ORG = new google.maps.LatLng(34.834509, 138.177419); // shimada city
 //  DEFAULT_ORG = new google.maps.LatLng(35.691180, 139.701038); // shinjuku st. east
@@ -178,16 +185,22 @@ const fetchRefuge = async () => {
   //    "select ?s ?name ?nameen ?lat ?lng ?classified ?graph ?address ?incharge ?diameter {\n" + 
   // 福井市: fire_hydrants,種別,管轄署所,住所,緯度,経度,口径,備考
   // 倉敷市: 全国地方公共団体コード,ID,地方公共団体名,種別,所在地_全国地方公共団体コード,町字ID,所在地_連結表記,所在地_都道府県,所在地_市区町村,所在地_町字,所在地_番地以下,建物名等(方書),緯度,経度,口径,備考
+  // 彦根市: 水利種別(消火栓),水利種別(消火栓)名,市町村(消火栓)名,担当区内通番(消火栓),設置場所-1(消火栓),配管径,Ｘ座標(栓)(座標),Ｙ座標(栓)(座標),緯度(栓)(座標),経度(栓)(座標),備考
   const data = await CSV.fetchJSON(fn);
   const map = {
     fire_hydrants: "name",
     ID: "name",
+    "担当区内通番(消火栓)": "name",
     緯度: "lat",
     経度: "lng",
+    "緯度(栓)(座標)": "lat",
+    "経度(栓)(座標)": "lng",
     種別: "classified",
+    "水利種別(消火栓)名": "classified",
     住所: "address",
     所在地_連結表記: "address",
     口径: "diameter",
+    配管径: "diameter",
     備考: "note",
   };
   const res = data.map(i => {
@@ -206,7 +219,23 @@ const fetchRefuge = async () => {
   // ['公設消火栓', '公設防火水槽', '河川', 'その他', 'プール', '受水槽', '私設防火水槽', '私設消火栓', '海', '堀', '沈砂池'] // 福井市
   // ['消火栓', '防火水そう'] // 倉敷市
   res.forEach(i => {
-    if (i.lat > 90) {
+    if (i.lat > 1000000) {
+      const fix0 = (n) => n[0] == "0" ? n.substring(1) : n;
+      /*
+      i.lat = i.lat / 10000000;
+      i.lng = fix0(i.lng) / 10000000;
+      */
+      const f = (a) => {
+        const d = fix0(a.substring(0, 3));
+        const m = fix0(a.substring(3, 5));
+        const s = fix0(a.substring(5, 10)) / 1000;
+        const d2 = dms2d(d, m, s);
+        //console.log(a, d, m, s, d2);
+        return d2;
+      };
+      i.lat = f(i.lat);
+      i.lng = f(i.lng);
+    } else if (i.lat > 90) {
       const tmp = i.lat;
       i.lat = i.lng;
       i.lng = tmp;
@@ -228,8 +257,6 @@ const loadRefuge = async (ll) => {
     }
     return true;
   });
-  const dlat = 0.01 / 2;
-  const dlng = 0.02 / 2;
   const lat = ll[0];
   const lng = ll[1];
   const latmin = lat - dlat;
@@ -564,7 +591,7 @@ body {
 
 <div class="src">
 APP: <a href=https://creativecommons.org/licenses/by/4.0/ target=_blank>CC BY</a> <a href=https://fukuno.jig.jp/1494 target=_blank>Taisuke Fukuno / Create Everyday</a><br>
-DATA: <a href=https://www.okayama-opendata.jp/resources/14754 target=_blank>倉敷市_消防水利施設一覧_令和06年02月現在 | 倉敷市_消防水利施設一覧 | データカタログ | おかやまオープンデータカタログ</a><br>
+DATA: <a href=https://data.bodik.jp/dataset/252026_shoukasen_20200401/resource/88ae56c2-504e-41f9-92d3-ff1175e8d94e target=_blank>消火栓設置場所一覧 - 消火栓設置場所一覧 - CKAN</a><br>
 <a href=https://github.com/code4fukui/findhydrant_kurashikicity/>ソースコード on GitHub</a> (forked <a href=https://github.com/code4fukui/findhydrant>findhydrant</a>)<br>
 要望はこちら <a href=https://github.com/code4fukui/findhydrant/issues>Issues on GitHub</a><br>
 fork歓迎、プルリクエストもお気軽に！<br>
