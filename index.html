@@ -13,6 +13,8 @@ import { LeafletGSI } from "https://js.sabae.cc/LeafletGSI.js";
 import { Geo3x3 } from "https://geo3x3.com/Geo3x3.js";
 import { ArrayUtil } from "https://js.sabae.cc/ArrayUtil.js";
 
+const fn = "332020_fire_hydrant_202404_standard.csv";
+
 const allflg = new URL(document.location).searchParams.get("all") === "";
 
 const getLL = function(lat, lng) {
@@ -21,7 +23,8 @@ const getLL = function(lat, lng) {
 
 //	DEFAULT_ORG = new google.maps.LatLng(40.392834, -3.723986); // madrid
 //const DEFAULT_ORG = new getLL(35.943352, 136.188597); // sabae st.
-const { lat, lng } = Geo3x3.decode("E91387367371883486"); // fukui st.
+//const { lat, lng } = Geo3x3.decode("E91387367371883486"); // fukui st.
+const { lat, lng } = Geo3x3.decode("E913712673633332"); // kurashiki city
 const DEFAULT_ORG = new getLL(lat, lng);
 //	DEFAULT_ORG = new google.maps.LatLng(34.834509, 138.177419); // shimada city
 //	DEFAULT_ORG = new google.maps.LatLng(35.691180, 139.701038); // shinjuku st. east
@@ -47,7 +50,7 @@ const getIconHydrant = function(data) {
 	// ['公設消火栓', '公設防火水槽', '河川', 'その他', 'プール', '受水槽', '私設防火水槽', '私設消火栓', '海', '堀', '沈砂池']
 	const c = data.classified;
 	if (c.endsWith("消火栓")) return "img/icon_hydrant.png";
-	if (c.endsWith("防火水槽")) return "img/icon_hydrant2.png";
+	if (c.endsWith("防火水槽") || c.endsWith("防火水そう")) return "img/icon_hydrant2.png";
 	if (c.endsWith("プール")) return "img/icon_hydrant3.png";
 	return "img/icon_hydrant1.png";
 	/*
@@ -173,14 +176,17 @@ let cacheddata = null;
 const fetchRefuge = async () => {
 	if (cacheddata) return cacheddata;
 	//		"select ?s ?name ?nameen ?lat ?lng ?classified ?graph ?address ?incharge ?diameter {\n" + 
-	// fire_hydrants,種別,管轄署所,住所,緯度,経度,口径,備考
-	const data = await CSV.fetchJSON("fire_hydrants.csv");
+	// 福井市: fire_hydrants,種別,管轄署所,住所,緯度,経度,口径,備考
+	// 倉敷市: 全国地方公共団体コード,ID,地方公共団体名,種別,所在地_全国地方公共団体コード,町字ID,所在地_連結表記,所在地_都道府県,所在地_市区町村,所在地_町字,所在地_番地以下,建物名等(方書),緯度,経度,口径,備考
+	const data = await CSV.fetchJSON(fn);
 	const map = {
 		fire_hydrants: "name",
+		ID: "name",
 		緯度: "lat",
 		経度: "lng",
 		種別: "classified",
 		住所: "address",
+		所在地_連結表記: "address",
 		口径: "diameter",
 		備考: "note",
 	};
@@ -197,7 +203,17 @@ const fetchRefuge = async () => {
 	});
 	const clss = ArrayUtil.toUnique(res.map(i => i.classified));
 	console.log(clss);
-	// ['公設消火栓', '公設防火水槽', '河川', 'その他', 'プール', '受水槽', '私設防火水槽', '私設消火栓', '海', '堀', '沈砂池']
+	// ['公設消火栓', '公設防火水槽', '河川', 'その他', 'プール', '受水槽', '私設防火水槽', '私設消火栓', '海', '堀', '沈砂池'] // 福井市
+	// ['消火栓', '防火水そう'] // 倉敷市
+	res.forEach(i => {
+		if (i.lat > 90) {
+			const tmp = i.lat;
+			i.lat = i.lng;
+			i.lng = tmp;
+			//console.log("flipped 緯度経度", i.ID);
+		}
+	});
+	console.log(res);
 	return res;
 };
 
@@ -548,20 +564,17 @@ body {
 
 <div class="src">
 APP: <a href=https://creativecommons.org/licenses/by/4.0/ target=_blank>CC BY</a> <a href=https://fukuno.jig.jp/1494 target=_blank>Taisuke Fukuno / Create Everyday</a><br>
-DATA: <a href=http://linkdata.org/work/rdf1s9409i target=_blank>消防水利施設一覧｜オープンデータ共有＆ダウンロード｜LinkData</a><br>
-<a href=https://github.com/code4fukui/findhydrant_fukuicity/>ソースコード on GitHub</a> (forked <a href=https://github.com/code4fukui/findhydrant>findhydrant</a>)<br>
+DATA: <a href=https://www.okayama-opendata.jp/resources/14754 target=_blank>倉敷市_消防水利施設一覧_令和06年02月現在 | 倉敷市_消防水利施設一覧 | データカタログ | おかやまオープンデータカタログ</a><br>
+<a href=https://github.com/code4fukui/findhydrant_kurashikicity/>ソースコード on GitHub</a> (forked <a href=https://github.com/code4fukui/findhydrant>findhydrant</a>)<br>
 要望はこちら <a href=https://github.com/code4fukui/findhydrant/issues>Issues on GitHub</a><br>
 fork歓迎、プルリクエストもお気軽に！<br>
 </div>
 
 <div class="pr">
 [PR]<br>
-<a x-href="http://fukuno.jig.jp/cntr/?u=" href=https://howml.github.io/akijikan/ target=_blank>
-<img src=https://howml.github.io/akijikan/img/navimage.png width=50%><br>
-AKIJIKAN</a><br>
-『忙しいビジネスマンの心の止まり木』
-出張先での打ち合わせまでの数時間、帰りの電車までの数時間・・・
-「時間がないので肩肘張った観光はできないが、折角遠くに来たからには、空き時間でその土地ならではのものを見てみたい」と思うのは出張族の常。 「AKIJIKAN（空き時間）」はそんなビジネスマンの想いを形にしたスマホアプリです。
+<a href=https://ichigojam.net/>小学生におすすめ、子供プログラミングパソコン「IchigoJam」</a><br>
+<a href=https://code4fukui.github.io/Wirth/>中高生向け教育用プログラミング言語「Wirth」</a><br>
+<a href=https://fukuno.jig.jp//>一日一創 by 福野泰介</a><br>
 </div>
 
 </body>
